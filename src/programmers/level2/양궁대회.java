@@ -3,6 +3,9 @@ package programmers.level2;
 import java.util.*;
 
 public class 양궁대회 {
+    static int[] apeachArray;
+    static List<Score> list;
+
     public static void main(String[] args) {
         solution(5,new int[]{2,1,1,1,0,0,0,0,0,0,0});
         solution(1,new int[]{1,0,0,0,0,0,0,0,0,0,0});
@@ -11,103 +14,98 @@ public class 양궁대회 {
     }
 
     public static int[] solution(int n, int[] info) {
-        int[] answer = new int[11];
-        List<Target> list = new ArrayList<>();
-        for(int i=0;i<info.length;i++){
-            if(info[i]>0) list.add(new Target(10-i,info[i],(double)(10-i)*2/(info[i]+1)));
-            else list.add(new Target(10-i,info[i],(double)(10-i)));
+        apeachArray = info;
+        list = new ArrayList<Score>();
+
+        int depth = Arrays.stream(apeachArray).max().getAsInt();
+        for(;depth>=0 ; depth--){
+            getScore(n,depth,new Score(new int[11]));
         }
-        Collections.sort(list);
-        int apach = 0;
-        int lion = 0;
-        int arrows = n;
-        for(Target target : list){
-            if(arrows < target.count+1){
-                if(target.count > 0) apach += target.point;
-                continue;
-            }else{
-                arrows -= target.count+1;
-                answer[10-target.point] = target.count+1;
-                lion += target.point;
-            }
+
+        if(list.get(0).difference<=0){
+            System.out.println(-1);
+            return new int[]{-1};
         }
-        if(arrows!=0) answer[10] = arrows;
-        for(int i=1;i<info.length;i++){
-            int[] newAnswer = new int[11];
-            int newApach = 0;
-            int newLion = 0;
-            int newArrow = n;
-            for(int j=0;j<list.size();j++){
-                if(j<=i || newArrow < list.get(j).count+1){
-                    if(list.get(j).count > 0) newApach += list.get(j).point;
-                }else{
-                    newArrow -= list.get(j).count+1;
-                    newAnswer[10-list.get(j).point] = list.get(j).count+1;
-                    newLion += list.get(j).point;
+
+        for (int item :list.get(0).lionArray){
+            System.out.print(item);
+        }
+        System.out.println();
+        return list.get(0).lionArray;
+    }
+
+    public static void getScore(int N,int depth,Score score){
+        for(int i=0; i<apeachArray.length;i++){
+            if(apeachArray[i]==depth){
+                if(N < depth+1){
+                    getScore(N,depth-1,score);
+                    break;
+                }
+
+                score.lionArray[i] = depth+1;
+                N -= depth+1;
+                for(int newDepth = depth-1;newDepth>=0 ; newDepth--){
+                    int[] newArray = Arrays.copyOf(score.lionArray,11);
+                    Score newScore = new Score(newArray);
+                    getScore(N,newDepth,newScore);
                 }
             }
-            if(newArrow!=0) newAnswer[10] = newArrow;
-            for(int item : newAnswer){
-                System.out.print(item);
+        }
+
+        if(depth == 0 && N !=0){
+            score.lionArray[10] = N;
+            N = 0;
+        }
+
+        if(N == 0){
+            score.setDifference();
+            if(list.size()==0){
+                list.add(score);
+            }else{
+                list.add(score);
+                Collections.sort(list);
+                list.remove(1);
             }
-            System.out.print(" " + (newLion-newApach));
-            System.out.println();
-            if(newLion-newApach > lion - apach){
-                lion = newLion;
-                apach = newApach;
-                answer = newAnswer;
-            }else if(newLion-newApach == lion - apach){
-                for(int a=newAnswer.length-1;a>=0;a--){
-                    if(newAnswer[a] > answer[a]){
-                        lion = newLion;
-                        apach = newApach;
-                        answer = newAnswer;
-                        break;
-                    }else if(newAnswer[a] < answer[a] && answer[a]!=0){
-                        break;
+        }
+    }
+
+    public static class Score implements Comparable<Score>{
+        int[] lionArray;
+        int difference;
+
+        public Score(int[] lionArray) {
+            this.lionArray = lionArray;
+            this.difference = 0;
+        }
+
+        public int setDifference() {
+            int lion = 0;
+            int apeach = 0;
+            for (int i=0;i<11;i++){
+                if(lionArray[i]>apeachArray[i]){
+                    lion += 10-i;
+                }else if(lionArray[i]<=apeachArray[i] && apeachArray[i] !=0){
+                    apeach += 10-i;
+                }
+            }
+            this.difference = lion - apeach;
+            return this.difference;
+        }
+
+        @Override
+        public int compareTo(Score o) {
+            if(this.difference > o.difference){
+                return -1;
+            }else if(this.difference == o.difference){
+                for(int i=lionArray.length-1;i>0;i--){
+                    if(this.lionArray[i] > o.lionArray[i]){
+                        return -1;
+                    }else if(this.lionArray[i] < o.lionArray[i]){
+                        return 1;
                     }
                 }
             }
-        }
-
-        if(lion <= apach) return new int[]{-1};
-        for(int item : answer){
-            System.out.print(item);
-        }
-        System.out.print(" " + (lion-apach));
-        System.out.println();
-        System.out.println();
-        return answer;
-    }
-
-    public static class Target implements Comparable<Target>{
-        int point;
-        int count;
-        double expect;
-
-        public Target(int point,int count ,double expect){
-            this.point = point;
-            this.count = count;
-            this.expect = expect;
-        }
-
-        @Override
-        public int compareTo(Target o) {
-            if(this.expect == o.expect){
-                if(this.point> o.point) return -1;
-                return 1;
-            }
-            if(this.expect > o.expect) return -1;
             return 1;
-        }
-
-        @Override
-        public String toString() {
-            return "Target{" +
-                    "point=" + point +
-                    ", count=" + count +
-                    ", expect=" + expect +
-                    '}';
         }
     }
 }
