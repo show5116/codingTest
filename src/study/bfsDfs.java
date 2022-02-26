@@ -13,6 +13,8 @@ public class bfsDfs {
         n = 3;
         visit = new boolean[n];
         map = new int[n][n];
+
+
         dfs(0);
         bfs(0);
     }
