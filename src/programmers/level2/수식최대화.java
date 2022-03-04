@@ -1,12 +1,11 @@
 package programmers.level2;
 
-import javax.jws.Oneway;
 import java.util.*;
 
 public class 수식최대화 {
     public static void main(String[] args) {
         solution("100-200*300-500+20");
-        //solution("50*6-3*2");
+        solution("50*6-3*2");
     }
 
     public static long solution(String expression) {
@@ -33,7 +32,7 @@ public class 수식최대화 {
 
         long answer = 0;
         for(Object[] order: orderList){
-            answer = getAnswer(order, new ArrayList<>(numList),operList);
+            answer = Math.max(answer,getAnswer(order, new ArrayList<>(numList),new ArrayList<>(operList)));
         }
 
         return answer;
@@ -69,16 +68,17 @@ public class 수식최대화 {
     }
 
     public static long getAnswer(Object[] order,List<Long> numList,List<Character> operList){
-        long answer = 0;
         for(Object oper : order){
             while (true){
-                if(operList.indexOf(oper) == -1){
+                int index = operList.indexOf(oper);
+                if(index == -1){
                     break;
                 }
-
+                numList.set(index,calculate(numList.get(index),numList.get(index+1),operList.get(index)));
+                numList.remove(index+1);
+                operList.remove(index);
             }
         }
-
-        return Math.abs(answer);
+        return Math.abs(numList.get(0));
     }
 }
