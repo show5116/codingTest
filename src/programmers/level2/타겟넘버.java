@@ -1,40 +1,31 @@
 package programmers.level2;
 
 public class 타겟넘버 {
-    static int answer;
+    static int answer = 0;
 
     public static void main(String[] args) {
-
+        solution(new int[]{1,1,1,1,1},5);
+        solution(new int[]{4,1,2,1},2);
     }
 
-    public int solution(int[] numbers, int target) {
-        // 1. answer은 전역변수로 선언.
-        answer = 0;
-
-        // 2. dfs수행.
+    public static int solution(int[] numbers, int target) {
         dfs(numbers,target,0,0);
-
         return answer;
     }
 
-    public void dfs(int[] numbers,int target,int idx,int sum){
-        // 4. 모든 정수를 탐색했을 때,
-        if(idx == numbers.length){
-            // 5. 누적합이 target과 동일하면 answer++ 후 메소드 종료.
+    public static void dfs(int[] numbers,int target,int start,int sum){
+        if(start == numbers.length){
             if(sum == target) answer++;
             return;
         }
 
-        // 6. 현재 인덱스의 정수를 +로 합해준다.
-        sum+=numbers[idx];
-        // 7. 다음 인덱스 dfs 수행.
-        dfs(numbers,target,idx+1,sum);
-        // 8. 6.의 값을 다시 빼준 뒤,
-        sum-=numbers[idx];
-        // 9. 현재 인덱스의 정수를 -로 합해준다.
-        sum+=(-1 * numbers[idx]);
-        // 10. 다시 다음 인덱스 dfs 수행.
-        dfs(numbers,target,idx+1,sum);
+        sum+=numbers[start];
+
+        dfs(numbers,target,start+1,sum);
+        sum-=numbers[start];
+        sum+=(-1 * numbers[start]);
+
+        dfs(numbers,target,start+1,sum);
 
     }
 }
