@@ -6,7 +6,10 @@ import java.util.List;
 
 public class 뉴스클러스터링 {
     public static void main(String[] args) {
-
+        //solution("FRANCE","french");
+        //solution("handshake","shake hands");
+        solution("aa1+aa2","AAAA12");
+        //solution("E=M*C^2","e=m*c^2");
     }
 
     public static int solution(String str1, String str2) {
